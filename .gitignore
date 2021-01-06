@@ -1,0 +1,38 @@
+# STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# IntelliJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+# Netbeans
+nb-configuration.xml
+nbactions.xml
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# BlueJ files
+*.ctxt
+
+# VS Code
+.vscode/
+
+# Log file
+*.log
+
+# Virtual machine crash logs
+hs_err_pid*
