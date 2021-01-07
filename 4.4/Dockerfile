@@ -26,3 +26,8 @@ RUN set -ex; \
   gpgconf --kill all; \
   rm -rf "$GNUPGHOME"; \
   apt-key list > /dev/null
+
+ENV MONGO_MAJOR=4.4
+ENV MONGO_VERSION=4.4.3
+
+RUN echo "deb http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org%-unstable/4.4 multiverse" | tee "/etc/apt/sources.list.d/mongodb-org%-unstable.list"
