@@ -11,3 +11,18 @@ RUN apt-get update \
     gnupg \
     gosu \
   && rm -rf /var/lib/apt/lists/*
+
+# Add mongodb public repository
+RUN set -ex; \
+  key='20691EEC35216C63CAF66CE1656408E390CFB1F5'; \
+  export GNUPGHOME="$(mktemp -d)"; \
+  ( \
+    gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key" \
+    || gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" \
+    || gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" \
+    || gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" \
+  ); \
+  gpg --batch --export "$key" > /etc/apt/trusted.gpg.d/mongodb.gpg; \
+  gpgconf --kill all; \
+  rm -rf "$GNUPGHOME"; \
+  apt-key list > /dev/null
