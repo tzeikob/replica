@@ -48,3 +48,10 @@ RUN set -x \
   && rm -f /usr/local/bin/systemctl \
   && rm -rf /var/lib/mongodb \
   && mv /etc/mongod.conf /etc/mongod.conf.orig
+
+# Create data and configdb folders
+RUN mkdir -p /data/db /data/configdb \
+  && chown -R mongodb:mongodb /data/db /data/configdb
+
+VOLUME /data/db /data/configdb
+
