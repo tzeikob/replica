@@ -10,6 +10,7 @@ RUN apt-get update \
     nano \
     gnupg \
     gosu \
+    ca-certificates \
   && rm -rf /var/lib/apt/lists/*
 
 # Add mongodb public repository
@@ -30,4 +31,20 @@ RUN set -ex; \
 ENV MONGO_MAJOR=4.4
 ENV MONGO_VERSION=4.4.3
 
-RUN echo "deb http://repo.mongodb.org/apt/ubuntu bionic/mongodb-org%-unstable/4.4 multiverse" | tee "/etc/apt/sources.list.d/mongodb-org%-unstable.list"
+RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGO_MAJOR} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_MAJOR}.list
+
+# Install mongodb server along with mongos, shell and other tools
+RUN set -x \
+  && ln -s /bin/true /usr/local/bin/systemctl \
+  && export DEBIAN_FRONTEND=noninteractive \
+  && apt-get update \
+  && apt-get install -y \
+    mongodb-org=${MONGO_VERSION} \
+    mongodb-org-server=${MONGO_VERSION} \
+    mongodb-org-shell=${MONGO_VERSION} \
+    mongodb-org-mongos=${MONGO_VERSION} \
+    mongodb-org-tools=${MONGO_VERSION} \
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -f /usr/local/bin/systemctl \
+  && rm -rf /var/lib/mongodb \
+  && mv /etc/mongod.conf /etc/mongod.conf.orig
