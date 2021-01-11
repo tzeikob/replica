@@ -49,11 +49,14 @@ RUN set -x \
   && rm -rf /var/lib/mongodb \
   && mv /etc/mongod.conf /etc/mongod.conf.orig
 
-# Create the db data folder
-RUN mkdir -p /data/db \
-  && chown -R mongodb:mongodb /data/db
+# Create the data db and config folders
+RUN mkdir -p /data/db /config/mongo \
+  && chown -R mongodb:mongodb /data/db /config/mongo
 
-VOLUME /data/db
+VOLUME ["/data/db", "/config/mongo"]
+
+# Copy the default config file
+COPY config/mongod.conf /config/mongod.conf
 
 # Set the container's entry point
 COPY docker-entrypoint.sh /usr/local/bin/

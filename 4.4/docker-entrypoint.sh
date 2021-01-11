@@ -6,9 +6,10 @@ shopt -s nullglob
 if [[ "$1" == mongo* ]]; then
   echo "Entrypoint script for MongoDB Server ${MONGO_VERSION} started"
 
-  # Declare data directory path
-  declare -g DATADIR
+  # Declare data and config directory paths
+  declare -g DATADIR CONFIGDIR
   DATADIR="/data/db"
+  CONFIGDIR="/config/mongo"
 
   # Change data directory with permissions for mongodb user on running as root
   if [ "$(id -u)" = "0" ]; then
@@ -16,6 +17,7 @@ if [[ "$1" == mongo* ]]; then
 
     # Todo: Maybe catch this if running "mongod" only
     find $DATADIR \! -user mongodb -exec chown mongodb '{}' +
+    find $CONFIGDIR \! -user mongodb -exec chown mongodb '{}' +
 
     # Make sure we can write to stdout and stderr as mongodb
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
