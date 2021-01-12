@@ -33,6 +33,9 @@ ENV MONGO_VERSION=4.4.3
 
 RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGO_MAJOR} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_MAJOR}.list
 
+# Create the data and config folders
+RUN mkdir -p /data/db /etc/mongo
+
 # Install mongodb server along with mongos, shell and other tools
 RUN set -x \
   && ln -s /bin/true /usr/local/bin/systemctl \
@@ -47,16 +50,15 @@ RUN set -x \
   && rm -rf /var/lib/apt/lists/* \
   && rm -f /usr/local/bin/systemctl \
   && rm -rf /var/lib/mongodb \
-  && mv /etc/mongod.conf /etc/mongod.conf.orig
-
-# Create the data db and config folders
-RUN mkdir -p /data/db /config/mongo \
-  && chown -R mongodb:mongodb /data/db /config/mongo
-
-VOLUME ["/data/db", "/config/mongo"]
+  && mv /etc/mongod.conf /etc/mongo/mongod.conf.orig
 
 # Copy the default config file
-COPY config/mongod.conf /config/mongod.conf
+COPY config/mongod.conf /etc/mongo/mongod.conf
+
+# Update data and config folder ownerships
+RUN chown -R mongodb:mongodb /data/db /etc/mongo
+
+VOLUME ["/data/db", "/etc/mongo"]
 
 # Set the container's entry point
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -65,4 +67,4 @@ RUN chmod +x usr/local/bin/docker-entrypoint.sh \
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
-CMD ["mongod"]
+CMD ["mongod", "--config", "/etc/mongo/mongod.conf"]

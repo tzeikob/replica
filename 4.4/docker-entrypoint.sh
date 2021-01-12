@@ -9,13 +9,13 @@ if [[ "$1" == mongo* ]]; then
   # Declare data and config directory paths
   declare -g DATADIR CONFIGDIR
   DATADIR="/data/db"
-  CONFIGDIR="/config/mongo"
+  CONFIGDIR="/etc/mongo"
 
   # Change data directory with permissions for mongodb user on running as root
   if [ "$(id -u)" = "0" ]; then
     echo "Switching to mongodb user"
 
-    # Todo: Maybe catch this if running "mongod" only
+    # Update data and config folder ownership
     find $DATADIR \! -user mongodb -exec chown mongodb '{}' +
     find $CONFIGDIR \! -user mongodb -exec chown mongodb '{}' +
 
