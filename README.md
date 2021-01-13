@@ -121,7 +121,6 @@ processManagement:
 #snmp:
 ```
 
-
 ### Access the container's shell
 
 The docker exec command allows you to run commands inside a Docker container. The following command line will give you a bash shell inside your MongoDB server container:
