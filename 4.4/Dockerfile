@@ -52,13 +52,13 @@ RUN set -x \
   && rm -rf /var/lib/mongodb \
   && mv /etc/mongod.conf /etc/mongo/mongod.conf.orig
 
-# Copy the default config file
+# Copy a default config file
 COPY config/mongod.conf /etc/mongo/mongod.conf
 
 # Update data and config folder ownerships
 RUN chown -R mongodb:mongodb /data/db /etc/mongo
 
-VOLUME ["/data/db", "/etc/mongo"]
+VOLUME /data/db
 
 # Set the container's entry point
 COPY docker-entrypoint.sh /usr/local/bin/
