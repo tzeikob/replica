@@ -74,7 +74,7 @@ run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file. You can find below, a base configuration file to start with mysql daemon configuration.
+the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file. You can find below, a base configuration file to start with mongo daemon configuration.
 
 ```
 # mongod.conf
