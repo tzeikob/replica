@@ -137,6 +137,14 @@ The log is available through Docker's container log, you can tail of the file by
 docker logs -f -n all any-name
 ```
 
+### Create database dump files
+
+A simple way to create database dumps is to use `docker exec` and run the tool from the same container, like so:
+
+```
+docker exec any-name sh -c 'exec mongodump -d db-name --archive' > path/to/db-name.archive
+```
+
 ## License
 View [license](https://github.com/mongodb/mongo/blob/6ea81c883e7297be99884185c908c7ece385caf8/README#L89-L95) information for the software contained in this image.
 
