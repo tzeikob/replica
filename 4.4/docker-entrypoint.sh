@@ -25,6 +25,14 @@ if [[ "$1" == mongo* ]]; then
     exec gosu mongodb "$BASH_SOURCE" "$@"
   fi
 
+  # Enable replication mode
+  if [ "$REPLICA_SET_NAME" ]; then
+    echo "Container is running in replication mode with name $REPLICA_SET_NAME"
+
+    # Uncomment replication line to enable replica set to the given name
+    sed -i "/#replication/c\replication:\n  replSetName: $REPLICA_SET_NAME" $CONFIGDIR/mongod.conf
+  fi
+
   # Use numactl to start your mongod, config servers and mongos
   numa='numactl --interleave=all'
   if $numa true &> /dev/null; then
