@@ -21,11 +21,11 @@ if [[ "$1" == mongo* ]]; then
   fi
 
   # Enable replication mode
-  if [ "$REPLICA_SET_NAME" ]; then
-    echo "Container is running in replication mode with name $REPLICA_SET_NAME"
+  if [ "$MONGO_REPLICA_SET" ]; then
+    echo "MongoDB is running on replication mode with name $MONGO_REPLICA_SET"
 
     # Uncomment replication line to enable replica set to the given name
-    sed -i "/#replication/c\replication:\n  replSetName: $REPLICA_SET_NAME" $MONGO_CONFIG_HOME/mongod.conf
+    sed -i "/#replication/c\replication:\n  replSetName: $MONGO_REPLICA_SET" $MONGO_CONFIG_HOME/mongod.conf
   fi
 
   # Use numactl to start your mongod, config servers and mongos
