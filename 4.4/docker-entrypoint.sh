@@ -6,18 +6,13 @@ shopt -s nullglob
 if [[ "$1" == mongo* ]]; then
   echo "Entrypoint script for MongoDB Server ${MONGO_VERSION} started"
 
-  # Declare data and config directory paths
-  declare -g DATADIR CONFIGDIR
-  DATADIR="/data/db"
-  CONFIGDIR="/etc/mongo"
-
   # Change data directory with permissions for mongodb user on running as root
   if [ "$(id -u)" = "0" ]; then
     echo "Switching to mongodb user"
 
     # Update data and config folder ownership
-    find $DATADIR \! -user mongodb -exec chown mongodb '{}' +
-    find $CONFIGDIR \! -user mongodb -exec chown mongodb '{}' +
+    find $MONGO_DATA_HOME \! -user mongodb -exec chown mongodb '{}' +
+    find $MONGO_CONFIG_HOME \! -user mongodb -exec chown mongodb '{}' +
 
     # Make sure we can write to stdout and stderr as mongodb
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
@@ -30,7 +25,7 @@ if [[ "$1" == mongo* ]]; then
     echo "Container is running in replication mode with name $REPLICA_SET_NAME"
 
     # Uncomment replication line to enable replica set to the given name
-    sed -i "/#replication/c\replication:\n  replSetName: $REPLICA_SET_NAME" $CONFIGDIR/mongod.conf
+    sed -i "/#replication/c\replication:\n  replSetName: $REPLICA_SET_NAME" $MONGO_CONFIG_HOME/mongod.conf
   fi
 
   # Use numactl to start your mongod, config servers and mongos
@@ -40,4 +35,4 @@ if [[ "$1" == mongo* ]]; then
   fi
 fi
 
-exec "$@"
+exec "$@" --config $MONGO_CONFIG_HOME/mongod.conf
