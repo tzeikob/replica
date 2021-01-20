@@ -17,7 +17,7 @@ if [[ "$1" == mongo* ]]; then
     # Make sure we can write to stdout and stderr as mongodb
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
 
-    exec gosu mongodb "$BASH_SOURCE" "$@"
+    exec gosu mongodb "$BASH_SOURCE" "$@" --config $MONGO_CONFIG_HOME/mongod.conf
   fi
 
   # Enable replication mode
@@ -35,4 +35,4 @@ if [[ "$1" == mongo* ]]; then
   fi
 fi
 
-exec "$@" --config $MONGO_CONFIG_HOME/mongod.conf
+exec "$@"
