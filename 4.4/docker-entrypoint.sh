@@ -2,6 +2,11 @@
 set -eo pipefail
 shopt -s nullglob
 
+# Postfix any given inline mongod configuration argument
+if [ "${1:0:1}" = '-' ]; then
+  set -- mongod "$@"
+fi
+
 # Skip if we aren't running mongo related binaries
 if [[ "$1" == mongo* ]]; then
   echo "Entrypoint script for MongoDB Server ${MONGO_VERSION} started"
@@ -17,15 +22,8 @@ if [[ "$1" == mongo* ]]; then
     # Make sure we can write to stdout and stderr as mongodb
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
 
+    # Any given inline argument will override the corresponding setting in the config file
     exec gosu mongodb "$BASH_SOURCE" "$@" --config $MONGO_CONFIG_HOME/mongod.conf
-  fi
-
-  # Enable replication mode
-  if [ "$MONGO_REPLICA_SET" ]; then
-    echo "MongoDB is running on replication mode with name $MONGO_REPLICA_SET"
-
-    # Uncomment replication line to enable replica set to the given name
-    sed -i "/#replication/c\replication:\n  replSetName: $MONGO_REPLICA_SET" $MONGO_CONFIG_HOME/mongod.conf
   fi
 
   # Use numactl to start your mongod, config servers and mongos
