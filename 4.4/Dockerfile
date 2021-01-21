@@ -38,11 +38,13 @@ RUN set -ex; \
 
 ENV MONGO_MAJOR=4.4
 ENV MONGO_VERSION=4.4.3
-
-RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGO_MAJOR} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_MAJOR}.list
+ENV MONGO_DATA_HOME=/data/db
+ENV MONGO_CONFIG_HOME=/etc/mongo
 
 # Create the data and config folders
-RUN mkdir -p /data/db /etc/mongo
+RUN mkdir -p ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
+
+RUN echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGO_MAJOR} multiverse" | tee /etc/apt/sources.list.d/mongodb-org-${MONGO_MAJOR}.list
 
 # Install mongodb server along with mongos, shell and other tools
 RUN set -x \
@@ -58,15 +60,15 @@ RUN set -x \
   && rm -rf /var/lib/apt/lists/* \
   && rm -f /usr/local/bin/systemctl \
   && rm -rf /var/lib/mongodb \
-  && mv /etc/mongod.conf /etc/mongo/mongod.conf.orig
+  && mv /etc/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf.orig
 
 # Copy a default config file
-COPY config/mongod.conf /etc/mongo/mongod.conf
+COPY config/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf
 
 # Update data and config folder ownerships
-RUN chown -R mongodb:mongodb /data/db /etc/mongo
+RUN chown -R mongodb:mongodb ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
 
-VOLUME /data/db
+VOLUME ${MONGO_DATA_HOME}
 
 # Set the container's entry point
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -75,4 +77,4 @@ RUN chmod +x usr/local/bin/docker-entrypoint.sh \
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 EXPOSE 27017
-CMD ["mongod", "--config", "/etc/mongo/mongod.conf"]
+CMD ["mongod"]
