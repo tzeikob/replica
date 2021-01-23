@@ -115,6 +115,24 @@ at this point the replica set `rs0` will be ready for connections at `mongodb://
 
 >Note, that all the containers will be attached to the `host` network, not the default docker host network which is the `bridge` network.
 
+#### Using custom bridge network
+
+So far we used the `host` network to attach the container of the replica set, another way is to use instead a custom `bridge` docker network like so,
+
+```
+docker network create --driver bridge my-network
+```
+
+after that you should start each container with `--network my-network` network instead of the `--network host` and give to each container a different port to avoid conflicts. Make sure for each container that both the exposed and inner ports are matching `-p 27001:27001` and the mongod server is set to start at the same port `--port 27001`. Having all the containers up and running connect to the first one and initiate the replica set. The final step is to add the following rules into the `/etc/hosts` file of your host,
+
+```
+127.0.0.1 n1
+127.0.0.1 n2
+127.0.0.1 n3
+```
+
+this way your replicat set will be ready to accept connection at `mongodb://n1:27001,n2:27002,n3:27003/db-name?repliaSet=rs0`.
+
 ### Mount database files to the host
 
 In order to mount the container's database files (`/data/db`) into your host, you only have to use the volume flag like so:
