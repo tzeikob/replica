@@ -15,25 +15,106 @@ Replica is just a MongoDB Server docker image made for trivial and development p
 
 ## How to use this image
 
-### Start an image instance
+### Start a single node server
 
-Starting an instance is simple:
+Starting a single node server is simple:
 
 ```
 mkdir -p any-name
 cd any-name
 
-mkdir -p data
-mkdir -p scripts
-
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  -v $(pwd)/scripts:/home/scripts/:rw \
   tzeikob/replica:tag
 ```
 
-where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server.
+where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server. After that the MongoDB Server should be ready to accept connections at `mongodb://127.0.0.1:27017/db-name`.
+
+>Note, the container will be attached to the default docker host network, which is the `bridge` network.
+
+### Start a single member replica set
+
+You can create a container running as a single node server in replication mode like so:
+
+```
+mkdir -p any-name
+cd any-name
+
+docker run -d --network host --name any-name \
+  -v $(pwd)/data:/data/db \
+  tzeikob/replica:tag \
+  --replSet rs0 \
+  --port 27017
+```
+
+then you should connect to the container and initiate the replica set with a given configuration:
+
+```
+docker exec -it any-name bash
+
+mongo --port 27017
+
+rs.initiate({
+  _id: "rs0",
+  version: 1,
+  members: [{ _id: 0, host: "any-name:27017" }]
+});
+```
+
+after that the single member replica set will be ready to accept connections at `mongodb://127.0.0.1:27017/db-name?replicaSet=rs0`.
+
+>Note, that the container will be attached to the `host` network, not the default docker host network which is the `bridge` network.
+
+### Start a replica set of three members
+
+In order to create a three member replica set, you have to start three separate containers running as a single node server in replication mode like so:
+
+```
+mkdir -p any-name
+cd any-name
+
+docker run -d --network host --name n1 \
+  -v $(pwd)/data/n1:/data/db \
+  tzeikob/replica:tag \
+  --replSet rs0 \
+  --port 27017
+
+docker run -d --network host --name n2 \
+  -v $(pwd)/data/n2:/data/db \
+  tzeikob/replica:tag \
+  --replSet rs0 \
+  --port 27018
+
+docker run -d --network host --name n3 \
+  -v $(pwd)/data/n3:/data/db \
+  tzeikob/replica:tag \
+  --replSet rs0 \
+  --port 27019
+```
+
+after that you will have 3 different containers running in replication mode ready for configuration. Connect to the first one and initiate the replica set like so:
+
+
+```
+docker exec -it n1 bash
+
+mongo --port 27017
+
+rs.initiate({
+  _id: "rs0",
+  version: 1,
+  members: [
+    { _id: 0, host: "n1:27017" },
+    { _id: 1, host: "n2:27018" },
+    { _id: 2, host: "n3:27019" }
+  ]
+});
+```
+
+at this point the replica set `rs0` will be ready for connections at `mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/db-name?replicaSet=rs0`.
+
+>Note, that all the containers will be attached to the `host` network, not the default docker host network which is the `bridge` network.
 
 ### Mount database files to the host
 
