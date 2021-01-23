@@ -95,7 +95,6 @@ docker run -d --network host --name n3 \
 
 after that you will have 3 different containers running in replication mode ready for configuration. Connect to the first one and initiate the replica set like so:
 
-
 ```
 docker exec -it n1 bash
 
@@ -127,13 +126,16 @@ docker run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-keep in mind that you can remove the docker container at anytime, as long as you keep the `/data` folder on your host disk the next time you run/create again a new container instance with the `/data/db` volume mounted to this `/data` folder, the same database files will be used for the MongoDB Server.
+this way you can remove the container and start it again anytime witout loosing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the new container.
 
-### Mount folders and files from the host to the container
+### Mount other folders and files to the container
 
-In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use again the volume flag and instruct the docker to use read and write permissions (`rw`) like so:
+In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
 
 ```
+mkdir -p any-name
+cd any-name
+
 mkdir -p scripts
 
 docker run -d --name any-name \
@@ -143,9 +145,28 @@ docker run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-### Customize configuration with a custom configuration file
+### Customize configuration
 
-You can customize the configuration of the MongoDB server by providing your configuration file `mongod.conf` at the creation of the container like so:
+#### Enable configuration settings via command line arguments
+
+You can set any configuration settings via command line arguments like so:
+
+```
+mkdir -p any-name
+cd any-name
+
+docker run -d --name any-name \
+  -p 27111:27111 \
+  -v $(pwd)/data:/data/db \
+  tzeikob/replica:tag \
+  --port 27111
+```
+
+in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option is listed by the mongodb documentation.
+
+#### Customize configuration with a custom configuration file
+
+You can also customize the configuration of the server by providing your configuration file `mongod.conf` at the creation of the container like so:
 
 ```
 run -d --name any-name \
@@ -155,7 +176,9 @@ run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file. You can find below, a base configuration file to start with mongo daemon configuration.
+the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find below, a base configuration file to start with mongo daemon configuration.
+
+> Note, any given configuration passed as command line argument will override any corresponding setting in the configuration file.
 
 ```
 # mongod.conf
