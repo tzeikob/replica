@@ -29,9 +29,9 @@ docker run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server. After that the MongoDB Server should be ready to accept connections at `mongodb://127.0.0.1:27017/db-name`.
+where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://127.0.0.1:27017/db-name`.
 
->Note, the container will be attached to the default docker host network, which is the `bridge` network.
+>Note, the container will be attached to the `bridge` network, default docker host network.
 
 ### Start a single member replica set
 
@@ -62,9 +62,9 @@ rs.initiate({
 });
 ```
 
-after that the single member replica set will be ready to accept connections at `mongodb://127.0.0.1:27017/db-name?replicaSet=rs0`.
+after that the single member replica set will be ready for connections at `mongodb://127.0.0.1:27017/db-name?replicaSet=rs0`.
 
->Note, that the container will be attached to the `host` network, not the default docker host network which is the `bridge` network.
+>Note, the container will be attached to the `host` network, not the default `bridge` network.
 
 ### Start a replica set of three members
 
@@ -111,19 +111,19 @@ rs.initiate({
 });
 ```
 
-at this point the replica set `rs0` will be ready for connections at `mongodb://127.0.0.1:27017,127.0.0.1:27018,127.0.0.1:27019/db-name?replicaSet=rs0`.
+at this point the replica set will be ready for connections at `mongodb://n1:27017,n2:27018,n3:27019/db-name?replicaSet=rs0`.
 
->Note, that all the containers will be attached to the `host` network, not the default docker host network which is the `bridge` network.
+>Note, all the containers will be attached to the `host` network, not the default `bridge` network.
 
 #### Using custom bridge network
 
-So far we used the `host` network to attach the container of the replica set, another way is to use instead a custom `bridge` docker network like so,
+So far we've used the `host` network to attach each container of the replica set, another way is to use instead a custom `bridge` docker network like so,
 
 ```
 docker network create --driver bridge my-network
 ```
 
-after that you should start each container with `--network my-network` network instead of the `--network host` and give to each container a different port to avoid conflicts. Make sure for each container that both the exposed and inner ports are matching `-p 27001:27001` and the mongod server is set to start at the same port `--port 27001`. Having all the containers up and running connect to the first one and initiate the replica set. The final step is to add the following rules into the `/etc/hosts` file of your host,
+after that you should start each container with `--network my-network` network instead of the `--network host` and give a different port to avoid conflicts. Make sure that both the exposed and inner ports are matching `-p 27001:27001` and the mongod server is set to start at the same port `--port 27001`. Having all the containers up and running connect to the first one and initiate the replica set. The final step is to add the following rules into the `/etc/hosts` file of your host disk,
 
 ```
 127.0.0.1 n1
@@ -131,7 +131,7 @@ after that you should start each container with `--network my-network` network i
 127.0.0.1 n3
 ```
 
-this way your replicat set will be ready to accept connection at `mongodb://n1:27001,n2:27002,n3:27003/db-name?repliaSet=rs0`.
+this way your replicat set will be ready for connections at `mongodb://n1:27001,n2:27002,n3:27003/db-name?repliaSet=rs0`.
 
 ### Mount database files to the host
 
@@ -144,7 +144,7 @@ docker run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-this way you can remove the container and start it again anytime witout loosing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the new container.
+this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the new container.
 
 ### Mount other folders and files to the container
 
@@ -165,7 +165,7 @@ docker run -d --name any-name \
 
 ### Customize configuration
 
-#### Enable configuration settings via command line arguments
+#### Enable configuration via command line arguments
 
 You can set any configuration settings via command line arguments like so:
 
@@ -180,9 +180,9 @@ docker run -d --name any-name \
   --port 27111
 ```
 
-in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option is listed by the mongodb documentation.
+in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option is listed in the mongodb's documentation.
 
-#### Customize configuration with a custom configuration file
+#### Customize configuration via a custom configuration file
 
 You can also customize the configuration of the server by providing your configuration file `mongod.conf` at the creation of the container like so:
 
@@ -194,54 +194,9 @@ run -d --name any-name \
   tzeikob/replica:tag
 ```
 
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find below, a base configuration file to start with mongo daemon configuration.
+> Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
 
-> Note, any given configuration passed as command line argument will override any corresponding setting in the configuration file.
-
-```
-# mongod.conf
-
-# for documentation of all options, see:
-#   http://docs.mongodb.org/manual/reference/configuration-options/
-
-# Where and how to store data.
-storage:
-  dbPath: /data/db
-  journal:
-    enabled: true
-#  engine:
-#  mmapv1:
-#  wiredTiger:
-
-# where to write logging data.
-# systemLog:
-#   destination: file
-#   logAppend: true
-#   path: /var/log/mongodb/mongod.log
-
-# network interfaces
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-
-# how the process runs
-processManagement:
-  timeZoneInfo: /usr/share/zoneinfo
-
-#security:
-
-#operationProfiling:
-
-#replication:
-
-#sharding:
-
-## Enterprise-Only Options:
-
-#auditLog:
-
-#snmp:
-```
+the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find a base configuration file to start with mongo daemon configuration [here](/4.4/config/mongod.conf).
 
 ### Access the container's shell
 
