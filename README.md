@@ -31,7 +31,7 @@ docker run -d --name any-name \
 
 where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://127.0.0.1:27017/db-name`.
 
->Note, the container will be attached to the `bridge` network, default docker host network.
+>Note, the container will be attached to the `bridge` network, the default docker host network.
 
 ### Start a single member replica set
 
