@@ -117,7 +117,7 @@ at this point the replica set will be ready for connections at `mongodb://localh
 
 #### Using custom bridge network
 
-So far we've used the `host` network to attach each container of the replica set, that's why we didn't use the port mapping flag `-p 27017:27017`.Another way is to use instead a custom `bridge` docker network like so,
+So far we've used the `host` network to attach each container of the replica set, that's why we didn't use the port mapping flag `-p 27017:27017`. Another way is to use instead a custom `bridge` docker network, first create a new custom bridge network,
 
 ```
 docker network create --driver bridge my-network
