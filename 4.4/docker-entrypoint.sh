@@ -2,7 +2,7 @@
 set -eo pipefail
 shopt -s nullglob
 
-# Append any given mongod command line configuration argument
+# Append any given mongod configuration argument
 if [ "${1:0:1}" = '-' ]; then
   set -- mongod "$@"
 fi
@@ -22,13 +22,8 @@ if [[ "$1" == mongo* ]]; then
     # Make sure we can write to stdout and stderr as mongodb
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
 
-    # Use the configuration file if executing mongo daemon
-    if [[ "$1" == mongod ]]; then
-      # Config arguments will override any corresponding setting in the config file
-      exec gosu mongodb "$BASH_SOURCE" "$@" --config $MONGO_CONFIG_HOME/mongod.conf
-    else
-      exec gosu mongodb "$BASH_SOURCE" "$@"
-    fi
+    # Execute mongod or mongos as mongodb user
+    exec gosu mongodb "$BASH_SOURCE" "$@"
   fi
 
   # Use numactl to start your mongod, config servers and mongos

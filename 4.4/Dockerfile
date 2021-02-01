@@ -62,9 +62,6 @@ RUN set -x \
   && rm -rf /var/lib/mongodb \
   && mv /etc/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf.orig
 
-# Copy a default config file
-COPY config/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf
-
 # Update data and config folder ownerships
 RUN chown -R mongodb:mongodb ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
 
