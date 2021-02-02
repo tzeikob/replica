@@ -20,41 +20,40 @@ Replica is just a docker image running a MongoDB Server ready for you to setup s
 Starting a standalone server is simple:
 
 ```
-mkdir -p any-name
-cd any-name
-
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
   tzeikob/replica:tag
 ```
 
-where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://127.0.0.1:27017/db-name`.
+where `any-name` is the name you want to assign to the container and `tag` is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
 
 >Note, the container will be attached to the default `bridge` docker network.
 
 ### Start a single member replica set
 
-You can create a container running as a single member replica set like so:
+You can create a container running as a single member replica set like so,
 
 ```
-mkdir -p any-name
-cd any-name
-
-docker run -d --network host --name any-name \
+docker run -d --name any-name \
+  -p 27017:27017 \
   -v $(pwd)/data:/data/db \
   tzeikob/replica:tag \
-  --replSet rs0 \
   --port 27017
+  --replSet rs0
 ```
 
-then you should connect to the container and initiate the replica set with a given configuration:
+> Note, make sure the `host` port matches the `exposed` port in case you've used the `--port` argument explicitly, otherwise the replication will fail to intitiate.
+
+then add the following rule in your `/etc/hosts` file,
 
 ```
-docker exec -it any-name bash
+127.0.0.1 any-name
+```
 
-mongo --port 27017
+connect to the container and open the mongo shell to initiate the replica set with the configuration below,
 
+```
 rs.initiate({
   _id: "rs0",
   version: 1,
@@ -62,9 +61,9 @@ rs.initiate({
 });
 ```
 
-after that the single member replica set will be ready for connections at `mongodb://localhost:27017/db-name?replicaSet=rs0`.
+after that replica set will be ready for connections at `mongodb://localhost:27017/db-name?replicaSet=rs0`.
 
->Note, the container will be attached to the `host` network, not the default `bridge` network.
+>Note, the container will be attached to the default `bridge` docker network.
 
 ### Start a three member replica set
 
