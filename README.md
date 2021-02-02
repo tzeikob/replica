@@ -209,52 +209,7 @@ run -d --name any-name \
 
 > Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
 
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find below a base configuration file to start with mongo daemon configuration,
-
-```
-# mongod.conf
-
-# for documentation of all options, see:
-#   http://docs.mongodb.org/manual/reference/configuration-options/
-
-# Where and how to store data.
-storage:
-  dbPath: /data/db
-  journal:
-    enabled: true
-#  engine:
-#  mmapv1:
-#  wiredTiger:
-
-# where to write logging data.
-# systemLog:
-#   destination: file
-#   logAppend: true
-#   path: /var/log/mongodb/mongod.log
-
-# network interfaces
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-
-# how the process runs
-processManagement:
-  timeZoneInfo: /usr/share/zoneinfo
-
-#security:
-
-#operationProfiling:
-
-#replication:
-
-#sharding:
-
-## Enterprise-Only Options:
-
-#auditLog:
-
-#snmp:
-```
+the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find a template [here](/templates/mongod.conf) as a base configuration file to start with mongo daemon configuration.
 
 ### Access the container's shell
 
