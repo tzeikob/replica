@@ -11,7 +11,7 @@
 
 ## What is the Replica?
 
-Replica is just a docker image running a MongoDB Server ready for you to setup replica set clusters, for trivial and development purposes only. It's purpose is to speed your workflow up and save you from the hassle of installing and setting it up from scratch. Each container is capable of running as a `mongod` daemon in `standalone` mode, in `config` mode or in `router` mode in the case of a sharded cluster.
+Replica is just a docker image running a MongoDB Server ready for you to setup standalone servers and replica set clusters, for trivial and development purposes only. It's purpose is to speed your workflow up and save you from the hassle to install and setup everything from scratch. The container is capable of running as a `mongod` daemon in `standalone` mode, in `config` mode or in `router` (mongos) mode in the case of a sharded cluster.
 
 ## How to use this image
 

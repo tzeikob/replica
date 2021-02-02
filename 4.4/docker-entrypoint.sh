@@ -23,7 +23,7 @@ if [[ "$1" == mongo* ]]; then
     chown --dereference mongodb "/proc/$$/fd/1" "/proc/$$/fd/2" || :
 
     # Execute mongod or mongos as mongodb user
-    exec gosu mongodb "$BASH_SOURCE" "$@"
+    exec gosu mongodb "$BASH_SOURCE" "$@" --bind_ip_all
   fi
 
   # Use numactl to start your mongod, config servers and mongos
