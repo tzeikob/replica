@@ -161,9 +161,6 @@ docker run -d --name any-name \
 You can set any configuration settings via command line arguments like so:
 
 ```
-mkdir -p any-name
-cd any-name
-
 docker run -d --name any-name \
   -p 27111:27111 \
   -v $(pwd)/data:/data/db \
@@ -171,23 +168,24 @@ docker run -d --name any-name \
   --port 27111
 ```
 
-in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option is listed in the mongodb's documentation.
+in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option from those listed in the mongodb's [documentation](https://docs.mongodb.com/manual/reference/configuration-file-settings-command-line-options-mapping/).
 
 #### Customize configuration via a custom configuration file
 
-You can also customize the configuration of the server by providing your configuration file `mongod.conf` at the creation of the container like so:
+You can also customize the configuration of the server by providing your configuration file, let's say you have a configuration file at `$(pwd)/config/mongod.conf`, create a container like so:
 
 ```
 run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
   -v $(pwd)/config/mongod.conf:/etc/mongo/mongod.conf \
-  tzeikob/replica:tag
+  tzeikob/replica:tag \
+  --config /etc/mongo/mongod.conf
 ```
 
 > Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
 
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file in the container's host. You can find a template [here](/templates/mongod.conf) as a base configuration file to start with mongo daemon configuration.
+You can find a template [here](/templates/mongod.conf) as a base configuration file to start with.
 
 ### Access the container's shell
 
