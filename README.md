@@ -136,25 +136,22 @@ In order to mount the container's database files (`/data/db`) into your host, yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag
+  tzeikob/replica:tag \
+  --port 27017
 ```
 
-this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the new container.
+this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
 
 ### Mount other folders and files to the container
 
 In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
 
 ```
-mkdir -p any-name
-cd any-name
-
-mkdir -p scripts
-
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica:tag
+  tzeikob/replica:tag \
+  --port 27017
 ```
 
 ### Customize configuration
