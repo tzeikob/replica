@@ -23,7 +23,8 @@ Starting a standalone server is simple:
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag
+  tzeikob/replica:tag \
+  --port 27017
 ```
 
 where `any-name` is the name you want to assign to the container and `tag` is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
@@ -43,9 +44,9 @@ docker run -d --name any-name \
   --replSet rs0
 ```
 
-> Note, make sure the `host` port matches the `exposed` port in case you've used the `--port` argument explicitly, otherwise the replication will fail to intitiate.
+> Note, the `host` port should match the `exposed` port the mongod is running at, otherwise you will not be able to resolve connections from the host to the replica set.
 
-then add the following rule in your `/etc/hosts` file,
+then add the following rule in your `/etc/hosts` file where `any-name` is the name of the container,
 
 ```
 127.0.0.1 any-name
