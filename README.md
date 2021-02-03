@@ -23,11 +23,11 @@ Starting a standalone server is simple:
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --port 27017
 ```
 
-where `any-name` is the name you want to assign to the container and `tag` is the tag specifying the version of the MongoDB server. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
+where `any-name` is the name you want to assign to the container. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
 
 >Note, the container will be attached to the default `bridge` docker network.
 
@@ -39,7 +39,7 @@ You can create a container running as a single member replica set like so,
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --port 27017
   --replSet rs0
 ```
@@ -81,7 +81,7 @@ docker run -d --name n1 \
   --network my-network \
   -p 27017:27017 \
   -v $(pwd)/data/n1:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --replSet rs0 \
   --port 27017
 
@@ -89,7 +89,7 @@ docker run -d --name n2 \
   --network my-network \
   -p 27018:27018 \
   -v $(pwd)/data/n2:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --replSet rs0 \
   --port 27018
 
@@ -97,7 +97,7 @@ docker run -d --name n3 \
   --network my-network \
   -p 27019:27019 \
   -v $(pwd)/data/n3:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --replSet rs0 \
   --port 27019
 ```
@@ -132,13 +132,13 @@ at this point the replica set will be ready for connections at `mongodb://n1:270
 
 #### Enable configuration via command line arguments
 
-You can set any configuration settings via command line arguments like so:
+You can use any configuration settings via command line arguments like so:
 
 ```
 docker run -d --name any-name \
   -p 27111:27111 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --port 27111
 ```
 
@@ -153,7 +153,7 @@ run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
   -v $(pwd)/config/mongod.conf:/etc/mongo/mongod.conf \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --config /etc/mongo/mongod.conf
 ```
 
@@ -169,7 +169,7 @@ In order to mount the container's database files (`/data/db`) into your host, yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --port 27017
 ```
 
@@ -183,7 +183,7 @@ In order to mount host's folders and files to be available into the container yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica:tag \
+  tzeikob/replica \
   --port 27017
 ```
 
