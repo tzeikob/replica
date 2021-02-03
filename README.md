@@ -46,12 +46,6 @@ docker run -d --name any-name \
 
 > Note, the `host` port should match the `exposed` port the mongod is running at, otherwise you will not be able to resolve connections from the host to the replica set.
 
-then add the following rule in your `/etc/hosts` file where `any-name` is the name of the container,
-
-```
-127.0.0.1 any-name
-```
-
 connect to the container and open the mongo shell to initiate the replica set with the configuration below,
 
 ```
