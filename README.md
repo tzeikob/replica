@@ -128,32 +128,6 @@ at this point the replica set will be ready for connections at `mongodb://n1:270
 
 >Note, all the containers will be attached to a custom `bridge` docker network.
 
-### Mount database files to the host
-
-In order to mount the container's database files (`/data/db`) into your host, you only have to use the volume flag like so:
-
-```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag \
-  --port 27017
-```
-
-this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
-
-### Mount other folders and files to the container
-
-In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
-
-```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica:tag \
-  --port 27017
-```
-
 ### Customize configuration
 
 #### Enable configuration via command line arguments
@@ -186,6 +160,32 @@ run -d --name any-name \
 > Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
 
 You can find a template [here](/templates/mongod.conf) as a base configuration file to start with.
+
+### Mount database files to the host
+
+In order to mount the container's database files (`/data/db`) into your host, you only have to use the volume flag like so:
+
+```
+docker run -d --name any-name \
+  -p 27017:27017 \
+  -v $(pwd)/data:/data/db \
+  tzeikob/replica:tag \
+  --port 27017
+```
+
+this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
+
+### Mount other folders and files to the container
+
+In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
+
+```
+docker run -d --name any-name \
+  -p 27017:27017 \
+  -v $(pwd)/scripts:/home/scripts/:rw \
+  tzeikob/replica:tag \
+  --port 27017
+```
 
 ### Access the container's shell
 
