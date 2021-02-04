@@ -38,8 +38,8 @@ RUN set -ex; \
 
 ENV MONGO_MAJOR=4.4
 ENV MONGO_VERSION=4.4.3
-ENV MONGO_DATA_HOME=/data/db
 ENV MONGO_CONFIG_HOME=/etc/mongo
+ENV MONGO_DATA_HOME=/data/db
 
 # Create the data and config folders
 RUN mkdir -p ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
