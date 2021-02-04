@@ -20,11 +20,7 @@ Replica is just a docker image running a MongoDB Server ready for you to setup s
 Starting a standalone server is simple:
 
 ```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
-  tzeikob/replica \
-  --port 27017
+docker run -d --name any-name -p 27017:27017 -v $(pwd)/data:/data/db tzeikob/replica --port 27017
 ```
 
 where `any-name` is the name you want to assign to the container. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
@@ -36,12 +32,7 @@ where `any-name` is the name you want to assign to the container. After that the
 You can create a container running as a single member replica set like so,
 
 ```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
-  tzeikob/replica \
-  --port 27017
-  --replSet rs0
+docker run -d --name any-name -p 27017:27017 -v $(pwd)/data:/data/db tzeikob/replica --port 27017 --replSet rs0
 ```
 
 > Note, the `host` port should match the `exposed` port the mongod is running at, otherwise you will not be able to resolve connections from the host to the replica set.
@@ -71,29 +62,11 @@ docker network create --driver bridge my-network
 then create three containers (n1, n2, n3) attached to the `my-network` network and with replication name set to `rs0`,
 
 ```
-docker run -d --name n1 \
-  --network my-network \
-  -p 27017:27017 \
-  -v $(pwd)/data/n1:/data/db \
-  tzeikob/replica \
-  --replSet rs0 \
-  --port 27017
+docker run -d --name n1 --network my-network -p 27017:27017 -v $(pwd)/data/n1:/data/db tzeikob/replica --replSet rs0 --port 27017
 
-docker run -d --name n2 \
-  --network my-network \
-  -p 27018:27018 \
-  -v $(pwd)/data/n2:/data/db \
-  tzeikob/replica \
-  --replSet rs0 \
-  --port 27018
+docker run -d --name n2 --network my-network -p 27018:27018 -v $(pwd)/data/n2:/data/db tzeikob/replica --replSet rs0 --port 27018
 
-docker run -d --name n3 \
-  --network my-network \
-  -p 27019:27019 \
-  -v $(pwd)/data/n3:/data/db \
-  tzeikob/replica \
-  --replSet rs0 \
-  --port 27019
+docker run -d --name n3 --network my-network -p 27019:27019 -v $(pwd)/data/n3:/data/db tzeikob/replica --replSet rs0 --port 27019
 ```
 
 after that you will have three containers running in replication mode ready for configuration. Before do the configuration of the replica set add the following three rules to the `/etc/hosts` file, each one for the corresponding containers (n1, n2, n3),
@@ -129,11 +102,7 @@ at this point the replica set will be ready for connections at `mongodb://n1:270
 You can use any configuration settings via command line arguments like so:
 
 ```
-docker run -d --name any-name \
-  -p 27111:27111 \
-  -v $(pwd)/data:/data/db \
-  tzeikob/replica \
-  --port 27111
+docker run -d --name any-name -p 27111:27111 -v $(pwd)/data:/data/db tzeikob/replica --port 27111
 ```
 
 in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option from those listed in the mongodb's [documentation](https://docs.mongodb.com/manual/reference/configuration-file-settings-command-line-options-mapping/).
@@ -160,11 +129,7 @@ You can find a template [here](/templates/mongod.conf) as a base configuration f
 In order to mount the container's database files (`/data/db`) into your host, you only have to use the volume flag like so:
 
 ```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
-  tzeikob/replica \
-  --port 27017
+docker run -d --name any-name -p 27017:27017 -v $(pwd)/data:/data/db tzeikob/replica --port 27017
 ```
 
 this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
@@ -174,11 +139,7 @@ this way you can remove the container and start it again anytime without losing 
 In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
 
 ```
-docker run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica \
-  --port 27017
+docker run -d --name any-name -p 27017:27017 -v $(pwd)/scripts:/home/scripts/:rw tzeikob/replica --port 27017
 ```
 
 ### Access the container's shell
