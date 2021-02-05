@@ -11,29 +11,149 @@
 
 ## What is the Replica?
 
-Replica is just a MongoDB Server docker image made for trivial and development purposes only, it's purpose is to speed your workflow up and save you from the hassle of installing and setting up a server at your own. Each container you create from this image will be a clean single node MongoDB server.
+Replica is just a docker image running a MongoDB Server ready for you to setup standalone servers and replica set clusters, for trivial and development purposes only. It's purpose is to speed your workflow up and save you from the hassle to install and setup everything from scratch. The container is capable of running as a `mongod` daemon in `standalone` mode, in `config` mode or in `router` (mongos) mode in the case of a sharded cluster.
 
 ## How to use this image
 
-### Start an image instance
+### Start a standalone server
 
-Starting an instance is simple:
+Starting a standalone server is simple:
 
 ```
-mkdir -p any-name
-cd any-name
-
-mkdir -p data
-mkdir -p scripts
-
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica:tag
+  tzeikob/replica \
+  --port 27017
 ```
 
-where `any-name` is the name you want to assign to the container and tag is the tag specifying the version of the MongoDB server.
+where `any-name` is the name you want to assign to the container. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
+
+>Note, the container will be attached to the default `bridge` docker network.
+
+### Start a single member replica set
+
+You can create a container running as a single member replica set like so,
+
+```
+docker run -d --name any-name \
+  -p 27017:27017 \
+  -v $(pwd)/data:/data/db \
+  tzeikob/replica \
+  --replSet rs0 \
+  --port 27017
+```
+
+> Note, the `host` port should match the `exposed` port the mongod is running at, otherwise you will not be able to resolve connections from the host to the replica set.
+
+connect to the container and open the mongo shell to initiate the replica set with the configuration below,
+
+```
+rs.initiate({
+  _id: "rs0",
+  version: 1,
+  members: [{ _id: 0, host: "localhost:27017" }]
+});
+```
+
+after that replica set will be ready for connections at `mongodb://localhost:27017/db-name?replicaSet=rs0`.
+
+>Note, the container will be attached to the default `bridge` docker network.
+
+### Start a three member replica set
+
+In order to create a replica set of three members, you have to start three separate containers attached to the same docker network. So first create a custom `bridge` docker network like so:
+
+```
+docker network create --driver bridge my-network
+```
+
+then create three containers (n1, n2, n3) attached to the `my-network` network and with replication name set to `rs0`,
+
+```
+docker run -d --name n1 \
+  --network my-network \
+  -p 27017:27017 \
+  -v $(pwd)/data/n1:/data/db \
+  tzeikob/replica \
+  --replSet rs0 \
+  --port 27017
+
+docker run -d --name n2 \
+  --network my-network \
+  -p 27018:27018 \
+  -v $(pwd)/data/n2:/data/db \
+  tzeikob/replica \
+  --replSet rs0 \
+  --port 27018
+
+docker run -d --name n3 \
+  --network my-network \
+  -p 27019:27019 \
+  -v $(pwd)/data/n3:/data/db \
+  tzeikob/replica \
+  --replSet rs0 \
+  --port 27019
+```
+
+after that you will have three containers running in replication mode ready for configuration, so connect to the first container (let's say n1) open the mongo shell and initiate the replica set like so:
+
+```
+rs.initiate({
+  _id: "rs0",
+  version: 1,
+  members: [
+    { _id: 0, host: "n1:27017" },
+    { _id: 1, host: "n2:27018" },
+    { _id: 2, host: "n3:27019" }
+  ]
+});
+```
+
+in order to be able to get connection to the replica set, add the following three mapping dns rules to the `/etc/hosts` file, one for each of the corresponding containers,
+
+```
+127.0.0.1 n1
+127.0.0.1 n2
+127.0.0.1 n3
+```
+
+at this point the replica set should be ready for connections at `mongodb://n1:27017,n2:27018,n3:27019/db-name?replicaSet=rs0`.
+
+>Note, all the containers will be attached to the custom `bridge` docker network named `my-network`.
+
+### Customize configuration
+
+#### Enable configuration via command line arguments
+
+You can use any configuration settings via command line arguments like so:
+
+```
+docker run -d --name any-name \
+  -p 27111:27111 \
+  -v $(pwd)/data:/data/db \
+  tzeikob/replica \
+  --port 27111
+```
+
+in this case we override the default port `27017` by a given command line argument, in order to start the server at the port `27111`. This way you can set any configuration option from those listed in the mongodb's [documentation](https://docs.mongodb.com/manual/reference/configuration-file-settings-command-line-options-mapping/).
+
+#### Customize configuration via a custom configuration file
+
+You can also customize the configuration of the server by providing your configuration file, let's say you have a configuration file at `$(pwd)/config/mongod.conf`, create a container like so:
+
+```
+run -d --name any-name \
+  -p 27017:27017 \
+  -v $(pwd)/data:/data/db \
+  -v $(pwd)/config/mongod.conf:/etc/mongo/mongod.conf \
+  tzeikob/replica \
+  --config /etc/mongo/mongod.conf
+```
+
+> Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
+
+You can find a template [here](/templates/mongod.conf) as a base configuration file to start with.
 
 ### Mount database files to the host
 
@@ -43,82 +163,22 @@ In order to mount the container's database files (`/data/db`) into your host, yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica:tag
+  tzeikob/replica \
+  --port 27017
 ```
 
-keep in mind that you can remove the docker container at anytime, as long as you keep the `/data` folder on your host disk the next time you run/create again a new container instance with the `/data/db` volume mounted to this `/data` folder, the same database files will be used for the MongoDB Server.
+this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
 
-### Mount folders and files from the host to the container
+### Mount other folders and files to the container
 
-In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use again the volume flag and instruct the docker to use read and write permissions (`rw`) like so:
+In order to mount host's folders and files to be available into the container you have to create them beforehand into the host disk and use the volume flag and instruct the docker to use read and write (`rw`) permissions like so:
 
 ```
-mkdir -p scripts
-
 docker run -d --name any-name \
   -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
   -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica:tag
-```
-
-### Customize configuration with a custom configuration file
-
-You can customize the configuration of the MongoDB server by providing your configuration file `mongod.conf` at the creation of the container like so:
-
-```
-run -d --name any-name \
-  -p 27017:27017 \
-  -v $(pwd)/data:/data/db \
-  -v $(pwd)/config/mongod.conf:/etc/mongo/mongod.conf \
-  tzeikob/replica:tag
-```
-
-the configuration file `config/mongod.conf` will replace the existing default `/etc/mongo/mongod.conf` file. You can find below, a base configuration file to start with mongo daemon configuration.
-
-```
-# mongod.conf
-
-# for documentation of all options, see:
-#   http://docs.mongodb.org/manual/reference/configuration-options/
-
-# Where and how to store data.
-storage:
-  dbPath: /data/db
-  journal:
-    enabled: true
-#  engine:
-#  mmapv1:
-#  wiredTiger:
-
-# where to write logging data.
-# systemLog:
-#   destination: file
-#   logAppend: true
-#   path: /var/log/mongodb/mongod.log
-
-# network interfaces
-net:
-  port: 27017
-  bindIp: 0.0.0.0
-
-# how the process runs
-processManagement:
-  timeZoneInfo: /usr/share/zoneinfo
-
-#security:
-
-#operationProfiling:
-
-#replication:
-
-#sharding:
-
-## Enterprise-Only Options:
-
-#auditLog:
-
-#snmp:
+  tzeikob/replica \
+  --port 27017
 ```
 
 ### Access the container's shell

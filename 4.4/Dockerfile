@@ -38,8 +38,8 @@ RUN set -ex; \
 
 ENV MONGO_MAJOR=4.4
 ENV MONGO_VERSION=4.4.3
-ENV MONGO_DATA_HOME=/data/db
 ENV MONGO_CONFIG_HOME=/etc/mongo
+ENV MONGO_DATA_HOME=/data/db
 
 # Create the data and config folders
 RUN mkdir -p ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
@@ -61,9 +61,6 @@ RUN set -x \
   && rm -f /usr/local/bin/systemctl \
   && rm -rf /var/lib/mongodb \
   && mv /etc/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf.orig
-
-# Copy a default config file
-COPY config/mongod.conf ${MONGO_CONFIG_HOME}/mongod.conf
 
 # Update data and config folder ownerships
 RUN chown -R mongodb:mongodb ${MONGO_DATA_HOME} ${MONGO_CONFIG_HOME}
