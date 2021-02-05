@@ -23,7 +23,8 @@ Starting a standalone server is simple:
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica
+  tzeikob/replica \
+  --port 27017
 ```
 
 where `any-name` is the name you want to assign to the container. After that the server should be ready for connections at `mongodb://localhost:27017/db-name`.
@@ -39,7 +40,8 @@ docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
   tzeikob/replica \
-  --replSet rs0
+  --replSet rs0 \
+  --port 27017
 ```
 
 > Note, the `host` port should match the `exposed` port the mongod is running at, otherwise you will not be able to resolve connections from the host to the replica set.
@@ -161,7 +163,8 @@ In order to mount the container's database files (`/data/db`) into your host, yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/data:/data/db \
-  tzeikob/replica
+  tzeikob/replica \
+  --port 27017
 ```
 
 this way you can remove the container and start it again anytime without losing the old data, you only have to mount the host folder `$(pwd)/data` as a volume back to the container's db folder `/data/db`.
@@ -174,7 +177,8 @@ In order to mount host's folders and files to be available into the container yo
 docker run -d --name any-name \
   -p 27017:27017 \
   -v $(pwd)/scripts:/home/scripts/:rw \
-  tzeikob/replica
+  tzeikob/replica \
+  --port 27017
 ```
 
 ### Access the container's shell
