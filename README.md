@@ -159,7 +159,7 @@ run -d --name any-name \
 
 > Note, any given configuration passed as command line argument will override the corresponding setting in the configuration file, in case both methods have been used.
 
-You can find a template [here](/templates/mongod.conf) as a base configuration file to start with.
+You can find a template [here](https://github.com/tzeikob/replica/blob/main/templates/mongod.conf) as a base configuration file to start with.
 
 ### Mount database files to the host
 
