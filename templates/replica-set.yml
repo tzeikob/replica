@@ -1,0 +1,42 @@
+version: '3'
+
+networks:
+  replica:
+    driver: bridge
+
+services:
+  mongo-n1:
+    image: tzeikob/replica
+    container_name: mongo-n1
+    restart: "no"
+    networks:
+      - replica
+    ports:
+      - 27017:27017
+    volumes:
+      - ./data/mongo-n1:/data/db
+    command: --port 27017 --replSet rs0
+
+    mongo-n2:
+    image: tzeikob/replica
+    container_name: mongo-n2
+    restart: "no"
+    networks:
+      - replica
+    ports:
+      - 27018:27018
+    volumes:
+      - ./data/mongo-n2:/data/db
+    command: --port 27018 --replSet rs0
+
+    mongo-n3:
+    image: tzeikob/replica
+    container_name: mongo-n3
+    restart: "no"
+    networks:
+      - replica
+    ports:
+      - 27019:27019
+    volumes:
+      - ./data/mongo-n3:/data/db
+    command: --port 27019 --replSet rs0
