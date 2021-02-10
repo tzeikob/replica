@@ -1,42 +1,36 @@
-version: '3'
+version: '3.4'
 
 networks:
-  my-network:
+  network:
     driver: bridge
 
 services:
   n1:
     image: tzeikob/replica
-    container_name: n1
-    restart: "no"
     networks:
-      - my-network
-    ports:
-      - 27017:27017
+      - network
     volumes:
       - ./data/n1:/data/db
+    ports:
+      - 27017:27017
     command: --port 27017 --replSet rs0
 
   n2:
     image: tzeikob/replica
-    container_name: n2
-    restart: "no"
     networks:
-      - my-network
-    ports:
-      - 27018:27018
+      - network
     volumes:
       - ./data/n2:/data/db
+    ports:
+      - 27018:27018
     command: --port 27018 --replSet rs0
 
   n3:
     image: tzeikob/replica
-    container_name: n3
-    restart: "no"
     networks:
-      - my-network
-    ports:
-      - 27019:27019
+      - network
     volumes:
       - ./data/n3:/data/db
+    ports:
+      - 27019:27019
     command: --port 27019 --replSet rs0
