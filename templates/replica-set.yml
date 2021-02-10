@@ -17,7 +17,7 @@ services:
       - ./data/n1:/data/db
     command: --port 27017 --replSet rs0
 
-    n2:
+  n2:
     image: tzeikob/replica
     container_name: n2
     restart: "no"
@@ -29,7 +29,7 @@ services:
       - ./data/n2:/data/db
     command: --port 27018 --replSet rs0
 
-    n3:
+  n3:
     image: tzeikob/replica
     container_name: n3
     restart: "no"

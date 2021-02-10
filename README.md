@@ -99,7 +99,7 @@ docker run -d --name n3 \
 > Note, you can use this docker-compose [template](https://github.com/tzeikob/replica/blob/main/templates/replica-set.yml) instead of manually creating the `network` and the `containers`. Download it and just run the following command:
 > 
 > ```
-> docker-compose up -d
+> docker-compose -f ./replica-set.yml up -d
 > ```
 
 after that you will have three containers running in replication mode ready for configuration, so connect to the first container (let's say n1) open the mongo shell and initiate the replica set like so:
