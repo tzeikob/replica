@@ -1,0 +1,90 @@
+version: '3.4'
+
+networks:
+  network:
+    driver: bridge
+
+services:
+  n1:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n1:/data/db
+    command: --port 27017 --shardsvr --replSet shard1
+
+  n2:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n2:/data/db
+    command: --port 27017 --shardsvr --replSet shard1
+
+  n3:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n3:/data/db
+    command: --port 27017 --shardsvr --replSet shard1
+
+  n4:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n4:/data/db
+    command: --port 27017 --shardsvr --replSet shard2
+
+  n5:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n5:/data/db
+    command: --port 27017 --shardsvr --replSet shard2
+
+  n6:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/n6:/data/db
+    command: --port 27017 --shardsvr --replSet shard2
+
+  c1:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/c1:/data/db
+    command: --port 27017 --dbpath /data/db --configsvr --replSet configrs
+
+  c2:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/c2:/data/db
+    command: --port 27017 --dbpath /data/db --configsvr --replSet configrs
+
+  c3:
+    image: tzeikob/replica
+    networks:
+      - network
+    volumes:
+      - ./data/c3:/data/db
+    command: --port 27017 --dbpath /data/db --configsvr --replSet configrs
+
+  r1:
+    image: tzeikob/replica
+    networks:
+      - network
+    depends_on:
+      - c1
+      - c2
+      - c3
+    ports:
+      - 40000:40000
+    command: mongos --port 40000 --configdb configrs/c1:27017,c2:27017,c3:27017
