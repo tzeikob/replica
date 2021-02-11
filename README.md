@@ -104,7 +104,7 @@ docker run -d --name n3 \
 > 
 > where `project-name` can be any name related to your project.
 
-after that you will have three containers running in replication mode ready for configuration, so connect to the first container (let's say n1) open the mongo shell and initiate the replica set like so:
+after that you will have three containers running in replication mode ready for configuration, so connect to the first container, open the mongo shell and initiate the replica set like so:
 
 ```
 rs.initiate({
