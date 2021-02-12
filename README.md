@@ -4,6 +4,8 @@
 
 ## Supported tags and respective `Dockerfile` links
  * [4.4, latest](https://github.com/tzeikob/replica/blob/main/4.4/Dockerfile)
+ * [4.2](https://github.com/tzeikob/replica/blob/main/4.2/Dockerfile)
+ * [4.0](https://github.com/tzeikob/replica/blob/main/4.0/Dockerfile)
 
 ## Quick reference (cont.)
  * Where to file issues: [bug tracker](https://github.com/tzeikob/replica/issues)
